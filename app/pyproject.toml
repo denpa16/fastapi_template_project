@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "FastAPI template project"
+version = "0.1.0"
+description = "FastAPI template project"
+authors = ["Denis Pavlov <dinpavlov@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.95.0"
+uvicorn = "^0.21.1"
+sqlalchemy = "^2.0.9"
+psycopg2-binary = "2.9.6"
+aioredis = "2.0.*"
+
+[build-system]
+requires = ["poetry>=1.4.2"]
+build-backend = "poetry.core.masonry.api"
