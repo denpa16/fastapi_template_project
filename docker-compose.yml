@@ -1,0 +1,31 @@
+version: '3.9'
+
+x-app_environment: &app_environment
+  environment:
+    - SITE_HOST
+    - POSTGRES_PASSWORD
+    - POSTGRES_PORT
+    - POSTGRES_NAME
+    - POSTGRES_USER
+
+services:
+  app:
+    build:
+      context: ./app
+    <<: *app_environment
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15.2-alpine
+    volumes:
+      - postgresdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD
+      - POSTGRES_PORT
+      - POSTGRES_NAME
+      - POSTGRES_USER
+
+
+volumes:
+  postgresdata:
