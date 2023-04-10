@@ -7,6 +7,7 @@ services:
       - ./app/:/app/:cached
     depends_on:
       - db
+      - redis
     ports:
       - 8000:8000
 
@@ -14,3 +15,8 @@ services:
     restart: unless-stopped
     ports:
       - 15239:5432
+
+
+  redis:
+    ports:
+      - 6379:6379
