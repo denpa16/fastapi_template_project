@@ -3,15 +3,17 @@ version: '3.9'
 x-app_environment: &app_environment
   environment:
     - SITE_HOST
+    - SECRET_KEY
     - POSTGRES_PASSWORD
     - POSTGRES_PORT
     - POSTGRES_NAME
     - POSTGRES_USER
+    - POSTGRES_HOST
 
 services:
-  app:
+  backend:
     build:
-      context: ./app
+      context: backend
     <<: *app_environment
     depends_on:
       - db
