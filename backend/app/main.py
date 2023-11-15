@@ -4,5 +4,6 @@ app = FastAPI()
 
 
 @app.get("/")
-async def root():
-    return {"Start Page"}
+async def start_page() -> str:
+    """Тестовый апи."""
+    return f"Start Page"

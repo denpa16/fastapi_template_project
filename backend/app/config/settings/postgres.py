@@ -1,10 +1,12 @@
-from typing import Any
 from os import getenv
+from typing import Any
 
 from pydantic import BaseSettings, PostgresDsn, validator
 
 
 class PostgresSettings(BaseSettings):
+    """Конфиги БД."""
+
     scheme: str = "postgresql+asyncpg"
     host: str = getenv("POSTGRES_HOST")
     port: str = getenv("POSTGRES_PORT")

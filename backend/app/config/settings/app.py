@@ -4,6 +4,8 @@ from pydantic import BaseSettings
 
 
 class AppSettings(BaseSettings):
+    """Конфиги проекта."""
+
     session_secret_key: str = getenv("SECRET_KEY")
 
     class Config:
@@ -30,5 +32,7 @@ class AppSettings(BaseSettings):
                 "stream": "ext://sys.stdout",
             }
         )
-        base_config["loggers"].update({"": {"handlers": ["app_handler"], "level": "INFO", "propagate": False}})
+        base_config["loggers"].update(
+            {"": {"handlers": ["app_handler"], "level": "INFO", "propagate": False}}
+        )
         return base_config

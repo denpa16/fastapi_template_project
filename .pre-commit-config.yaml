@@ -1,0 +1,59 @@
+# https://pre-commit.com/
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: debug-statements
+      - id: mixed-line-ending
+        args: [ '--fix=lf' ]
+        description: Forces to replace line ending by the UNIX 'lf' character.
+      - id: check-merge-conflict
+      - id: check-ast
+
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v2.3.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [ commit-msg ]
+
+  # Конфигурация для проектов в релизе
+  - repo: https://github.com/psf/black
+    rev: '23.7.0'
+    hooks:
+      - id: black
+
+  - repo: https://github.com/pre-commit/mirrors-isort
+    rev: v5.10.1
+    hooks:
+      - id: isort
+
+  # Конфигурация для проектов, которые еще не в релизе
+#
+#  - repo: local
+#    hooks:
+#      - id: backend-black
+#        name: backend-black
+#        entry: docker-compose -f docker-compose.yml run --no-deps --rm backend /bin/sh -c "black --config pyproject.toml --check ."
+#        language: system
+#        files: ^backend/.*.(py|pyi)$
+#
+#      - id: backend-isort
+#        name: backend-isort
+#        entry: docker-compose -f docker-compose.yml run --no-deps --rm backend /bin/sh -c "isort --sp pyproject.toml --check-only ."
+#        language: system
+#        files: ^backend/.*.(py|pyi)$
+#
+#      - id: backend-mypy
+#        name: backend-mypy
+#        entry: docker-compose -f docker-compose.yml run --no-deps --rm backend /bin/sh -c "mypy --config-file setup.cfg ."
+#        language: system
+#        files: ^backend/.*.(py|pyi)$
+#        pass_filenames: false
+#
+#      - id: backend-flake8
+#        name: backend-flake8
+#        entry: docker-compose -f docker-compose.yml run --no-deps --rm backend /bin/sh -c "flake8 --statistics --config setup.cfg ."
+#        language: system
+#        files: ^backend/.*.(py|pyi)$
