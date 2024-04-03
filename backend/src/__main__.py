@@ -2,8 +2,8 @@ import uvicorn
 from fastapi import FastAPI
 from starlette.middleware.sessions import SessionMiddleware
 
-from app.api import routers
-from app.config import settings
+from src.api import routers
+from src.config import settings
 
 
 app: FastAPI = FastAPI()

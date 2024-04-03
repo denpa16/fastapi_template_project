@@ -14,9 +14,11 @@ RUN apt-get install -y --no-install-recommends \
 RUN pip install --user --no-cache-dir poetry==1.6
 
 ENV PATH="${PATH}:/root/.local/bin"
-RUN mkdir /app_dir
-COPY pyproject.toml poetry.lock /app_dir/
-WORKDIR /app_dir/
+
+COPY pyproject.toml poetry.lock /app/
+WORKDIR /app/
 RUN poetry install --no-interaction --no-ansi
-COPY / /app_dir/
+COPY wait-for /usr/bin/
+RUN chmod +x /usr/bin/wait-for
+COPY / /app/
 RUN chmod +x entrypoint.*

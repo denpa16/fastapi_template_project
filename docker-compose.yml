@@ -14,3 +14,12 @@ services:
     build:
       context: backend
     <<: *app_environment
+
+  db:
+    build:
+      context: ./db
+    environment:
+      - POSTGRES_PASSWORD
+      - POSTGRES_PORT
+      - POSTGRES_NAME
+      - POSTGRES_USER
