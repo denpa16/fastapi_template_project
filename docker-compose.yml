@@ -1,9 +1,7 @@
-version: '3.9'
+version: "3.9"
 
 x-app_environment: &app_environment
   environment:
-    - SITE_HOST
-    - SECRET_KEY
     - POSTGRES_PASSWORD
     - POSTGRES_PORT
     - POSTGRES_NAME
@@ -11,30 +9,8 @@ x-app_environment: &app_environment
     - POSTGRES_HOST
 
 services:
+
   backend:
     build:
       context: backend
     <<: *app_environment
-    depends_on:
-      - db
-      - redis
-
-  db:
-    image: postgres:15.2-alpine
-    volumes:
-      - postgresdata:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_PASSWORD
-      - POSTGRES_PORT
-      - POSTGRES_NAME
-      - POSTGRES_USER
-
-  redis:
-    image: redis:6.2-alpine
-    volumes:
-      - redisdata:/data
-
-
-volumes:
-  postgresdata:
-  redisdata:

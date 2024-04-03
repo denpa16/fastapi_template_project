@@ -1,45 +1,55 @@
-build:
-	docker-compose -f docker-compose.yml -f docker-compose.override.yml build
+THIS_FILE := $(lastword $(MAKEFILE_LIST))
 
-up:
-	docker-compose -f docker-compose.yml -f docker-compose.override.yml up
+COMPOSE_FILES := -f docker-compose.yml -f docker-compose.override.yml
 
-redis_up:
-	docker-compose up redis
+start:
+	docker-compose $(COMPOSE_FILES) up --remove-orphans -d
 
 down:
-	docker-compose down
+	docker-compose $(COMPOSE_FILES) down
 
-exec_backend:
-	docker-compose exec backend /bin/bash
+restart:
+	docker-compose $(COMPOSE_FILES) restart
 
-test:
-	docker-compose exec backend pytest
+rebuild:
+	docker-compose $(COMPOSE_FILE) up -d --remove-orphans --build
 
-shell:
-	docker-compose exec backend python manage.py shell
+ps:
+	docker-compose ps
+
+# e.g. make logs c=backend
+logs:
+	docker-compose $(COMPOSE_FILE) logs --tail=300 -f $(c)
+
+tests:
+	docker-compose $(COMPOSE_FILE) exec backend poetry run pytest --create-db $(c)
+
+tests-all:
+	docker-compose $(COMPOSE_FILE) exec backend poetry run pytest -p no:warnings --cov-report term:skip-covered --cov --cov-fail-under=93
+
+
+backend-shell:
+	docker-compose $(COMPOSE_FILES) exec backend bash
+
+django-shell:
+	docker-compose $(COMPOSE_FILES) exec backend poetry run python3 manage.py shell
+
+# e.g. make makemigrations c=django_app_name
+makemigrations:
+	docker-compose $(COMPOSE_FILES) exec backend poetry run python3 manage.py makemigrations $(c)
+
+# e.g. make migrate c=django_app_name
+migrate:
+	docker-compose $(COMPOSE_FILES) exec backend poetry run python3 manage.py migrate $(c)
 
 pre-commit:
 	pre-commit run --all-files
 
 linters:
-	black --config backend/pyproject.toml backend
-	isort --sp backend/pyproject.toml backend
-	flake8 --statistics --config backend/setup.cfg backend
+	docker-compose $(COMPOSE_FILES) exec backend poetry run ruff check . --fix
 
-check:
-	black --config backend/pyproject.toml backend --check
-	isort --sp backend/pyproject.toml backend --check-only
-	flake8 --statistics --config backend/setup.cfg backend
+format:
+	docker-compose $(COMPOSE_FILES) exec backend poetry run ruff format .
 
-ssh_dev:
-	ssh root@80.249.148.147
-
-ssh_prod:
-	ssh root@80.87.107.69
-
-get_crm_token_and_timestamp:
-	docker-compose exec backend python manage.py get_token_and_timestamp
-
-parse_properties:
-	docker-compose exec backend python manage.py parse_properties
+lint-check:
+	docker-compose $(COMPOSE_FILES) exec backend poetry run ruff check . --statistics

@@ -1,22 +1,11 @@
-version: '3.9'
+version: "3.9"
 
 services:
+
   backend:
     restart: unless-stopped
     volumes:
-      - ./backend/:/app_dir/:cached
-    depends_on:
-      - db
-      - redis
+      - ./backend/:/app/:cached
+    entrypoint: ./entrypoint.sh
     ports:
-      - 8000:8000
-
-  db:
-    restart: unless-stopped
-    ports:
-      - 15239:5432
-
-
-  redis:
-    ports:
-      - 6379:6379
+      - "8000:8000"

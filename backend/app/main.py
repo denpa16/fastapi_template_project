@@ -1,9 +1,19 @@
+import uvicorn
 from fastapi import FastAPI
 
-app = FastAPI()
+
+def get_fastapi_app() -> FastAPI:
+    app_ = FastAPI(
+        title="App title",
+        description="App description",
+        version="App version",
+        docs_url="App docs url",
+    )
+    return app_
 
 
-@app.get("/")
-async def start_page() -> str:
-    """Тестовый апи."""
-    return "Start Page"
+app: FastAPI = get_fastapi_app()
+
+
+if __name__ == "__main__":
+    uvicorn.run("app.main:app", reload=True)
