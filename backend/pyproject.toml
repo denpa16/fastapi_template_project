@@ -8,5 +8,7 @@ authors=["Denis Pavlov"]
 
 [tool.poetry.dependencies]
 python = "3.11.*"
-fastapi = "0.110.*"
+fastapi = {extras = ["all"], version = "0.110.*"}
 uvicorn = "0.29.*"
+itsdangerous = "2.1.2"
+pydantic-settings = "2.2.1"
