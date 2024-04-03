@@ -9,17 +9,17 @@ class PostgresSettings(BaseSettings):
     """Настройки postgres."""
 
     scheme: str = "postgresql+asyncpg"
-    host: str = getenv("POSTGRES_HOST", "localhost")
-    port: int = getenv("POSTGRES_PORT", 5432)
+    host: str = getenv("POSTGRES_HOST", "db")
+    port: int = getenv("POSTGRES_PORT", "5432")
     user: str = getenv("POSTGRES_USER", "postgres")
+    name: str = getenv("POSTGRES_NAME", "postgres")
     password: str = getenv("POSTGRES_PASSWORD", "postgres")
-    db: str = getenv("POSTGRES_HOST", "postgres")
-    dsn: PostgresDsn | None = None
+    dsn: str | None = f"{scheme}://{user}:{password}@{host}/{name}"
     echo: bool = False
 
     @validator("dsn", pre=True)
     def dsn_build(cls, value: str | None, values: dict[str, Any]) -> str:
-        """Подключение."""
+        """Создание dsn."""
         if isinstance(value, str):
             return value
 

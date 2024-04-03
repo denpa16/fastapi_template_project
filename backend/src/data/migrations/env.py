@@ -57,6 +57,8 @@ async def run_async_migrations() -> None:
     if "sqlalchemy.url" not in config.get_section(config.config_ini_section):
         config.set_main_option("sqlalchemy.url", settings.postgres.dsn)
 
+    print(config)
+
     connectable = async_engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
