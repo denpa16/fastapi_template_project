@@ -9,7 +9,7 @@ class Base:
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
 
 
-class Song(Base):
-    __tablename__ = "songs"
+class Project(Base):
+    __tablename__ = "projects"
 
     name = Column(String, nullable=False)
