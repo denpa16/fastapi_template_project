@@ -17,3 +17,7 @@ sqlalchemy = "^2.0.29"
 psycopg2 = "^2.9.9"
 asyncpg = "^0.29.0"
 sqlmodel = "^0.0.16"
+
+
+[tool.ruff]
+# select = ["ALL"]
