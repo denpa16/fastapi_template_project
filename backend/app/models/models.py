@@ -13,3 +13,4 @@ class Project(Base):
     __tablename__ = "projects"
 
     name = Column(String, nullable=False)
+    alias = Column(String, nullable=True)

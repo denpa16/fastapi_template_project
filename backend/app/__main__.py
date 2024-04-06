@@ -1,8 +1,8 @@
-from random import random
+from random import random, randrange
 from uuid import UUID
 
 from fastapi import FastAPI, Path
-from sqlalchemy import delete, exc, insert, select, update
+from sqlalchemy import delete, exc, insert, select, update, bindparam
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db import async_session
@@ -55,6 +55,41 @@ async def update_one(
     await session.execute(update(Project).where(Project.id == id).values(**update_data))
     result = await session.execute(select(Project).where(Project.id == id))
     projects = result.scalars().one
+    return projects
+
+
+@app.get("/projects/update_multiple_by_pk")
+async def update_multiple_by_pk(session: AsyncSession = async_session):
+    update_data = [
+        {
+            "id": "cebc78f1-3b69-4a48-b0c5-e95bec82f1d9",
+            "name": f"name_m_upd_{randrange(1000, 10000)}",
+            "alias": "som_alies",
+        },
+        {
+            "id": "1ed6c6c5-63c0-4e3b-8f67-81758e73f0db",
+            "name": f"name_m_upd_{randrange(1000, 10000)}",
+            "alias": "som_alies",
+        },
+    ]
+    await session.execute(update(Project), update_data)
+    result = await session.execute(select(Project))
+    projects = result.scalars().all()
+    return projects
+
+
+@app.get("/projects/update_multiple_by_field")
+async def update_multiple_by_field(session: AsyncSession = async_session):
+    """TODO: надо выяснить, почему не работает."""
+    update_data = [
+        {"u_name": "project_2", "alias": f"its_new_alias_{randrange(1000, 10000)}"},
+        {"u_name": "project_3", "alias": f"its_new_alias_{randrange(1000, 10000)}"},
+    ]
+    await session.execute(
+        update(Project).where(Project.name == bindparam("u_name")), update_data
+    )
+    result = await session.execute(select(Project))
+    projects = result.scalars().all()
     return projects
 
 
