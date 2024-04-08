@@ -159,6 +159,28 @@ uvicorn = {version = ">=0.12.0", extras = ["standard"], optional = true, markers
 all = ["email-validator (>=2.0.0)", "httpx (>=0.23.0)", "itsdangerous (>=1.1.0)", "jinja2 (>=2.11.2)", "orjson (>=3.2.1)", "pydantic-extra-types (>=2.0.0)", "pydantic-settings (>=2.0.0)", "python-multipart (>=0.0.7)", "pyyaml (>=5.3.1)", "ujson (>=4.0.1,!=4.0.2,!=4.1.0,!=4.2.0,!=4.3.0,!=5.0.0,!=5.1.0)", "uvicorn[standard] (>=0.12.0)"]
 
 [[package]]
+name = "fastapi-debug-toolbar"
+version = "0.6.2"
+description = "A debug toolbar for FastAPI."
+category = "main"
+optional = false
+python-versions = ">=3.8"
+
+[package.dependencies]
+anyio = ">=3.0.0"
+fastapi = ">=0.106.0"
+jinja2 = ">=2.9"
+pydantic = ">=2.0"
+pydantic-extra-types = ">=2.0.0"
+pydantic-settings = ">=2.0.0"
+pyinstrument = ">=3.0.0"
+sqlparse = ">=0.2.0"
+
+[package.extras]
+doc = ["markdown-include", "mkdocs", "mkdocs-material", "mkdocstrings"]
+test = ["bandit", "coverage", "httpx", "itsdangerous", "mypy", "pytest", "pytest-asyncio", "python-multipart", "ruff", "sqlalchemy", "tortoise-orm"]
+
+[[package]]
 name = "greenlet"
 version = "3.0.3"
 description = "Lightweight in-process concurrent programming"
@@ -356,6 +378,21 @@ toml = ["tomli (>=2.0.1)"]
 yaml = ["pyyaml (>=6.0.1)"]
 
 [[package]]
+name = "pyinstrument"
+version = "4.6.2"
+description = "Call stack profiler for Python. Shows you why your code is slow!"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.extras]
+bin = ["click", "nox"]
+docs = ["sphinx (==4.2.0)", "myst-parser (==0.15.1)", "furo (==2021.6.18b36)", "sphinxcontrib-programoutput (==0.17)"]
+examples = ["numpy", "django"]
+test = ["pytest", "flaky", "trio", "greenlet (>=3.0.0a1)", "pytest-asyncio (==0.12.0)", "sphinx-autobuild (==2021.3.14)", "ipython"]
+types = ["typing-extensions"]
+
+[[package]]
 name = "python-dotenv"
 version = "1.0.1"
 description = "Read key-value pairs from a .env file and set them as environment variables"
@@ -443,6 +480,19 @@ pydantic = ">=1.10.13,<3.0.0"
 SQLAlchemy = ">=2.0.0,<2.1.0"
 
 [[package]]
+name = "sqlparse"
+version = "0.4.4"
+description = "A non-validating SQL parser."
+category = "main"
+optional = false
+python-versions = ">=3.5"
+
+[package.extras]
+dev = ["flake8", "build"]
+doc = ["sphinx"]
+test = ["pytest", "pytest-cov"]
+
+[[package]]
 name = "starlette"
 version = "0.37.2"
 description = "The little ASGI library that shines."
@@ -458,7 +508,7 @@ full = ["httpx (>=0.22.0)", "itsdangerous", "jinja2", "python-multipart (>=0.0.7
 
 [[package]]
 name = "typing-extensions"
-version = "4.10.0"
+version = "4.11.0"
 description = "Backported and Experimental Type Hints for Python 3.8+"
 category = "main"
 optional = false
@@ -529,7 +579,7 @@ python-versions = ">=3.8"
 [metadata]
 lock-version = "1.1"
 python-versions = "3.10.*"
-content-hash = "b25afeca3532f650a597efec7a196439d2e71c910b461407530389348773b2f4"
+content-hash = "b644b81da6520727ba1cb7ba0bc0eaf8a6b566b6d95e6d11d924c52c186a1238"
 
 [metadata.files]
 alembic = []
@@ -544,6 +594,7 @@ dnspython = []
 email-validator = []
 exceptiongroup = []
 fastapi = []
+fastapi-debug-toolbar = []
 greenlet = []
 h11 = []
 httpcore = []
@@ -560,12 +611,14 @@ pydantic = []
 pydantic-core = []
 pydantic-extra-types = []
 pydantic-settings = []
+pyinstrument = []
 python-dotenv = []
 python-multipart = []
 pyyaml = []
 sniffio = []
 sqlalchemy = []
 sqlmodel = []
+sqlparse = []
 starlette = []
 typing-extensions = []
 ujson = []

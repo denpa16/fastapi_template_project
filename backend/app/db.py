@@ -15,7 +15,7 @@ class AsyncSessionBuilder:
         return self.session
 
 
-session_builder = AsyncSessionBuilder(database_url=DATABASE_URL, echo=False)
+session_builder = AsyncSessionBuilder(database_url=DATABASE_URL, echo=True)
 
 
 async def get_db_session() -> AsyncSession:

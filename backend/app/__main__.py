@@ -35,8 +35,7 @@ async def delete_multiple(session: AsyncSession = async_session):
 
 @app.get("/projects/{id}/delete_one")
 async def delete_one(
-    id: UUID = Path(alias="id"),
-    session: AsyncSession = async_session,
+    id: UUID = Path(alias="id"), session: AsyncSession = async_session
 ):
     result = await session.execute(delete(Project).where(Project.id == id))
     try:
