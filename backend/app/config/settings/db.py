@@ -10,7 +10,7 @@ class DatabaseSettings(BaseSettings):
 
     scheme: str = "postgresql+asyncpg"
     host: str = getenv("POSTGRES_HOST", "db")
-    port: str = getenv("POSTGRES_PORT")
+    port: int = getenv("POSTGRES_PORT")
     user: str = getenv("POSTGRES_USER")
     password: str = getenv("POSTGRES_PASSWORD")
     db: str = getenv("POSTGRES_DB")

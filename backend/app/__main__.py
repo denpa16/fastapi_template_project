@@ -5,8 +5,8 @@ from fastapi import FastAPI, Path
 from sqlalchemy import delete, exc, insert, select, update, bindparam
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db import async_session
-from app.models import Project
+from .db import async_session
+from .models import Project
 
 app = FastAPI()
 
