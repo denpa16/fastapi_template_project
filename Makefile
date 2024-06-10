@@ -10,3 +10,6 @@ migrate:
 
 tests:
 	docker-compose $(COMPOSE_FILES) exec backend poetry run pytest $(c)
+
+lock:
+	docker-compose $(COMPOSE_FILES) exec backend poetry lock

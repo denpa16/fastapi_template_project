@@ -21,6 +21,7 @@ fastapi-debug-toolbar = "^0.6.2"
 pytest = "^8.1.1"
 sqlalchemy-utils = "^0.41.2"
 pytest-asyncio = "^0.23.6"
+factory-boy = "^3.2.0"
 
 
 [tool.ruff]

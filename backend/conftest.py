@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_utils import create_database, drop_database
 
 from app.config import settings
-from app.models import Base
+from app.models import Base, Project
 from app.db import AsyncSessionBuilder
 
 pytest_plugins = ("asyncio",)
@@ -44,7 +44,7 @@ def create_db(test_postgres_dsn):
         drop_database(dsn)
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def tables(create_db, test_postgres_dsn):
     dsn: str = test_postgres_dsn(scheme="postgresql")
     engine = create_engine(dsn, echo=False)
@@ -117,3 +117,16 @@ def config() -> BaseSettings:
     from app.config import settings
 
     return settings
+
+
+@pytest.fixture()
+async def project_db_factory(override_get_db_session):
+    async def factory(project_data: dict):
+        async for s in override_get_db_session():
+            project = Project(**project_data)
+            s.add(project)
+            await s.flush()
+            await s.commit()
+        return project
+
+    return factory
