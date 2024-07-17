@@ -12,17 +12,15 @@ class S3ImageService:
         bucket_name: str,
         aws_access_key_id: Optional[str] = None,
         aws_secret_access_key: Optional[str] = None,
-        region_name: str = "us-east-1",
     ):
         self.bucket_name = bucket_name
         self.s3_client = boto3.client(
             "s3",
             aws_access_key_id=aws_access_key_id,
             aws_secret_access_key=aws_secret_access_key,
-            region_name=region_name,
         )
 
-    def upload_image(self, file: UploadFile, object_name: Optional[str] = None) -> str:
+    def write(self, file: UploadFile, object_name: Optional[str] = None) -> str:
         try:
             if object_name is None:
                 object_name = file.filename
