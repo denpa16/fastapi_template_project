@@ -24,8 +24,10 @@ class FacetFilterSet(Filter):
         model: Any
         specs_methods: dict = {}
         specs_skip: list = []
+        facets_methods: dict = {}
+        facets_skip: list = []
 
-    async def get_choices(self, field_name, session):
+    async def get_spec_choices(self, field_name, session):
         result = await session.execute(
             select(
                 getattr(self.Constants.model, "id"),
@@ -34,12 +36,15 @@ class FacetFilterSet(Filter):
         )
         return [{"label": item[0], "value": item[1]} for item in result.fetchall()]
 
+    async def get_facet_choices(self, field_name, result):
+        return [getattr(item, field_name) for item in result]
+
     async def specs(self, session):
         specs = []
         for field_name, _ in self.model_dump().items():
             if field_name in self.Constants.specs_skip:
                 continue
-            if method := self.Constants.specs_methods.get(field_name):
+            elif method := self.Constants.specs_methods.get(field_name):
                 specs.append(
                     {
                         "name": field_name,
@@ -50,11 +55,35 @@ class FacetFilterSet(Filter):
             specs.append(
                 {
                     "name": field_name,
-                    "choices": await self.get_choices(field_name, session),
+                    "choices": await self.get_spec_choices(field_name, session),
                 }
             )
 
         return specs
+
+    async def facets(self, session, query):
+        query_res = await session.execute(query)
+        result = query_res.scalars().all()
+        facets = []
+        for field_name, _ in self.model_dump().items():
+            if field_name in self.Constants.facets_skip:
+                continue
+            elif method := self.Constants.facets_methods.get(field_name):
+                facets.append(
+                    {
+                        "name": field_name,
+                        "choices": await getattr(self, method)(result),
+                    }
+                )
+                continue
+            facets.append(
+                {
+                    "name": field_name,
+                    "choices": await self.get_facet_choices(field_name, result),
+                }
+            )
+        count = len(result)
+        return {"facets": facets, "count": count}
 
 
 class ProjectFilter(FacetFilterSet):
@@ -62,11 +91,17 @@ class ProjectFilter(FacetFilterSet):
 
     class Constants(FacetFilterSet.Constants):
         model = Project
+        specs_methods: dict = {
+            "name": "get_name_specs",
+        }
+        specs_skip: list = []
+        facets_methods: dict = {
+            "name": "get_name_facets",
+        }
+        facets_skip: list = []
 
     class Config:
         populate_by_name = True
-        specs_methods: dict = {}
-        specs_skip: list = []
 
     async def get_name_specs(self, session):
         result = await session.execute(
@@ -76,6 +111,9 @@ class ProjectFilter(FacetFilterSet):
             )
         )
         return [{"label": item[0], "value": item[1]} for item in result.fetchall()]
+
+    async def get_name_facets(self, result):
+        return [item.name for item in result]
 
 
 @router.get("/")
@@ -96,6 +134,16 @@ async def get_specs(
 ):
     specs = await project_filter.specs(session)
     return specs
+
+
+@router.get("/facets")
+async def get_facets(
+    project_filter: ProjectFilter = FilterDepends(ProjectFilter),
+    session: AsyncSession = async_session,
+):
+    query = project_filter.filter(select(Project))
+    facets = await project_filter.facets(session, query)
+    return facets
 
 
 @router.get("/{id}")
