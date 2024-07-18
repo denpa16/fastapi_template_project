@@ -1,7 +1,7 @@
 import uuid
 
-from sqlalchemy import UUID, Column, String
-from sqlalchemy.orm import as_declarative
+from sqlalchemy import UUID, Column, String, Integer, ForeignKey
+from sqlalchemy.orm import as_declarative, relationship
 
 
 @as_declarative()
@@ -14,3 +14,12 @@ class Project(Base):
 
     name = Column(String, nullable=False)
     alias = Column(String, nullable=True)
+    buildings = relationship("Building", back_populates="project")
+
+
+class Building(Base):
+    __tablename__ = "buildings"
+
+    number = Column(Integer, nullable=False)
+    project_id = Column(UUID, ForeignKey("projects.id"))
+    project = relationship("Project", back_populates="buildings")
