@@ -1,4 +1,18 @@
-from .base import FacetFilterSet
+from .filters import (
+    FacetFilterSet,
+    CharInFilter,
+    IntegerInFilter,
+    CharFilter,
+    IntegerFilter,
+    BooleanFilter,
+)
 
 
-__all__ = ("FacetFilterSet",)
+__all__ = (
+    "FacetFilterSet",
+    "CharFilter",
+    "IntegerFilter",
+    "CharInFilter",
+    "IntegerInFilter",
+    "BooleanFilter",
+)

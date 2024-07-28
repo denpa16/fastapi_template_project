@@ -3,175 +3,60 @@ from uuid import UUID
 
 from fastapi import APIRouter, Request
 from fastapi import Path, Depends
-from pydantic import Field
 from sqlalchemy import delete, exc, insert, select, update, bindparam
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi_filter import FilterDepends
 
 from app.db import async_session
-from app.domains import FacetFilterSet
+from app.domains import (
+    FacetFilterSet,
+    CharInFilter,
+    BooleanFilter,
+)
 from app.models import Project
 
 router = APIRouter(prefix="/projects", tags=["Projects"])
 
 
-class ProjectFilter(FacetFilterSet):
-    name: str | None = Field(alias="names", default=None)
-
-    class Constants(FacetFilterSet.Constants):
-        model = Project
-        specs_methods: dict = {
-            "name": "get_name_specs",
-        }
-        specs_skip: list = []
-        facets_methods: dict = {
-            "name": "get_name_facets",
-        }
-        facets_skip: list = []
-
-    class Config:
-        populate_by_name = True
-
-    async def get_name_specs(self, session):
-        result = await session.execute(
-            select(
-                getattr(self.Constants.model, "alias"),
-                getattr(self.Constants.model, "name"),
-            )
-        )
-        return [{"label": item[0], "value": item[1]} for item in result.fetchall()]
-
-    async def get_name_facets(self, result):
-        return [item.name for item in result]
-
-
 @router.get("/")
 async def get_multiple(
-    filter: ProjectFilter = FilterDepends(ProjectFilter),
     session: AsyncSession = async_session,
 ):
-    query = filter.filter(select(Project))
-    result = await session.execute(query)
+    result = await session.execute(select(Project))
     projects = result.scalars().all()
     return projects
 
 
-class BaseFilter:
-    def __init__(
-        self,
-        field_name: str | None = None,
-        lookup_expr: str | None = None,
-    ):
-        if lookup_expr is None:
-            lookup_expr = "__eq__"
-        self.field_name = field_name
-        self.lookup_expr = lookup_expr
-
-
-class BaseInFilter:
-    def __init__(
-        self,
-        field_name: str | None = None,
-        lookup_expr: str | None = None,
-    ):
-        if lookup_expr is None:
-            lookup_expr = "in_"
-        self.field_name = field_name
-        self.lookup_expr = lookup_expr
-
-
-class BaseRangeFilter:
-    """TODO: _max и _min надо сделать."""
-
-    def __init__(
-        self,
-        field_name: str | None = None,
-        lookup_expr: str | None = None,
-    ):
-        if lookup_expr is None:
-            lookup_expr = "range_"
-        self.field_name = field_name
-        self.lookup_expr = lookup_expr
-
-
-class IntegerFilter(BaseFilter): ...
-
-
-class IntegerInFilter(BaseFilter): ...
-
-
-class RangeFilter(BaseRangeFilter): ...
-
-
-class CharFilter(BaseFilter): ...
-
-
-class CharInFilter(BaseInFilter): ...
-
-
-class FilterSet:
-    def __filter(self):
-        query = select(self.Meta.model)
-        _filters = self.__get_filters()
-        for key, value in self.__query_params:
-            if _filter := _filters.get(key):
-                try:
-                    model_field = getattr(self.Meta.model, key)
-                except AttributeError:
-                    continue
-                if isinstance(_filter, BaseFilter):
-                    query = query.filter(
-                        getattr(model_field, _filter.lookup_expr)(value)
-                    )
-                if isinstance(_filter, BaseInFilter):
-                    query = query.filter(
-                        getattr(model_field, _filter.lookup_expr)(value.split(","))
-                    )
-        return query
-
-    @classmethod
-    def __filter_list(cls):
-        return cls.__dict__.keys()
-
-    def __get_filters(self):
-        filters = {}
-        for key in self.__filter_list():
-            attr = getattr(self, key)
-            if isinstance(attr, BaseFilter | BaseInFilter):
-                filters[key] = attr
-        return filters
-
-    def __call__(self, request, *args, **kwargs):
-        self.__query_params = request.query_params.items()
-        return self.__filter()
-
-    class Meta:
-        model = None
-
-
-class TProjectFilter(FilterSet):
-    name = CharInFilter()
-    alias = CharInFilter()
+class ProjectFilter(FacetFilterSet):
+    name_s = CharInFilter(field_name="name", method="name_s_filter")
+    alias = BooleanFilter()
+    alias.facets = "get_alias_facets"
 
     class Meta:
         model = Project
+
+    def name_s_filter(self, query, name, value):
+        return query
+
+    def get_alias_facets(self, session):
+        return ["sss", "eee"]
 
 
 @router.get("/test")
 async def get_test_multiple(
     _: Request,
-    project_filter: TProjectFilter = Depends(TProjectFilter),
+    project_filter: ProjectFilter = Depends(ProjectFilter),
     session: AsyncSession = async_session,
 ):
-    sm = project_filter(_)
-    result = await session.execute(sm)
+    filter_query = project_filter(_)
+    result = await session.execute(filter_query)
     projects = result.scalars().all()
     return projects
 
 
 @router.get("/specs")
 async def get_specs(
-    project_filter: ProjectFilter = FilterDepends(ProjectFilter),
+    _: Request,
+    project_filter: ProjectFilter = Depends(ProjectFilter),
     session: AsyncSession = async_session,
 ):
     specs = await project_filter.specs(session)
@@ -180,12 +65,12 @@ async def get_specs(
 
 @router.get("/facets")
 async def get_facets(
-    project_filter: ProjectFilter = FilterDepends(ProjectFilter),
+    _: Request,
+    project_filter: ProjectFilter = Depends(ProjectFilter),
     session: AsyncSession = async_session,
 ):
-    query = project_filter.filter(select(Project))
-    facets = await project_filter.facets(session, query)
-    return facets
+    specs = await project_filter.facets(_, session)
+    return specs
 
 
 @router.get("/{id}")
