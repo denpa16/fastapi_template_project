@@ -8,6 +8,9 @@ makemigrations:
 migrate:
 	docker-compose $(COMPOSE_FILES) exec backend poetry run alembic upgrade head
 
+downgrate:
+	docker-compose $(COMPOSE_FILES) exec backend poetry run alembic downgrade "$(c)"
+
 tests:
 	docker-compose $(COMPOSE_FILES) exec backend poetry run pytest $(c)
 

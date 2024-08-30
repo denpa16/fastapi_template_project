@@ -80,8 +80,10 @@ class RelationshipFilter:
         method: str | None = None,
         **kwargs,
     ):
+        if field_name is None:
+            raise AttributeError
         if lookup_expr is None:
-            lookup_expr = "range_"
+            lookup_expr = "__eq__"
         self.field_name = field_name
         self.lookup_expr = lookup_expr
         self.method = method
@@ -93,25 +95,37 @@ class BaseFilterSet:
     def filter(self):
         query = select(self.Meta.model)
         _filters = self.get_filters()
-        for key, value in self.query_params:
-            if _filter := _filters.get(key):
-                key = _filter.field_name if _filter.field_name else key
-                try:
-                    model_field = getattr(self.Meta.model, key)
-                except AttributeError:
-                    continue
+        for query_key, value in self.query_params:
+            if _filter := _filters.get(query_key):
+                key = (
+                    _filter.field_name
+                    if (
+                        _filter.field_name
+                        and not isinstance(_filter, RelationshipFilter)
+                    )
+                    else query_key
+                )
                 if _filter.method:
                     try:
-                        query = getattr(self, _filter.method)(query, key, value)
+                        query = getattr(self, _filter.method)(query, query_key, value)
                     except AttributeError:
                         raise AttributeError
                 if isinstance(_filter, BaseFilter):
+                    model_field = getattr(self.Meta.model, key)
                     query = query.filter(
                         getattr(model_field, _filter.lookup_expr)(value)
                     )
                 if isinstance(_filter, BaseInFilter):
+                    model_field = getattr(self.Meta.model, key)
                     query = query.filter(
                         getattr(model_field, _filter.lookup_expr)(value.split(","))
+                    )
+                if isinstance(_filter, RelationshipFilter):
+                    if _filter.field_name is None:
+                        continue
+                    relationship = getattr(self.Meta.model, query_key)
+                    query = query.filter(
+                        relationship.any(**{_filter.field_name: value})
                     )
         return query
 
@@ -123,7 +137,7 @@ class BaseFilterSet:
         filters = {}
         for key in self.filter_list():
             attr = getattr(self, key)
-            if isinstance(attr, BaseFilter | BaseInFilter):
+            if isinstance(attr, BaseFilter | BaseInFilter | RelationshipFilter):
                 filters[key] = attr
         return filters
 
@@ -146,6 +160,7 @@ class FacetFilterSet(BaseFilterSet):
         return [{"label": item[0], "value": item[1]} for item in result.fetchall()]
 
     async def specs(self, session):
+        # d = await session.execute(select(self.Meta.model).filter(self.Meta.model.buildings.any(number=1)))
         specs = []
         for filter_name, _filter in self.get_filters().items():
             name = _filter.field_name if _filter.field_name else filter_name

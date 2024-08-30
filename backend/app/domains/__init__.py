@@ -5,6 +5,7 @@ from .filters import (
     CharFilter,
     IntegerFilter,
     BooleanFilter,
+    RelationshipFilter,
 )
 
 
@@ -15,4 +16,5 @@ __all__ = (
     "CharInFilter",
     "IntegerInFilter",
     "BooleanFilter",
+    "RelationshipFilter",
 )

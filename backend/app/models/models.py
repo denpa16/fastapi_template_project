@@ -23,3 +23,13 @@ class Building(Base):
     number = Column(Integer, nullable=False)
     project_id = Column(UUID, ForeignKey("projects.id"))
     project = relationship("Project", back_populates="buildings")
+
+    sections = relationship("Section", back_populates="building")
+
+
+class Section(Base):
+    __tablename__ = "sections"
+
+    number = Column(Integer, nullable=False)
+    building_id = Column(UUID, ForeignKey("buildings.id"))
+    building = relationship("Building", back_populates="sections")

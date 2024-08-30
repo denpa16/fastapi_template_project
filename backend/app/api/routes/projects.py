@@ -11,6 +11,7 @@ from app.domains import (
     FacetFilterSet,
     CharInFilter,
     BooleanFilter,
+    RelationshipFilter,
 )
 from app.models import Project
 
@@ -30,6 +31,7 @@ class ProjectFilter(FacetFilterSet):
     name_s = CharInFilter(field_name="name", method="name_s_filter")
     alias = BooleanFilter()
     alias.facets = "get_alias_facets"
+    buildings = RelationshipFilter(field_name="number")
 
     class Meta:
         model = Project
